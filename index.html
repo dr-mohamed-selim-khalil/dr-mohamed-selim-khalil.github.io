@@ -170,7 +170,7 @@ var lb=document.getElementById('lb');document.querySelectorAll('.gal .g').forEac
 var CFG={apiKey:"AIzaSyAcQbe-jbkr9Om9lxROyK1uPOqZDP_YS6E",authDomain:"dr-mohamed-selim-clinic.firebaseapp.com",projectId:"dr-mohamed-selim-clinic",storageBucket:"dr-mohamed-selim-clinic.firebasestorage.app",messagingSenderId:"27688280913",appId:"1:27688280913:web:e45b3e6fef66b667bd6970"};
 var rating=0,stars=document.querySelectorAll('#rstars .star'),rlist=document.getElementById('rlist'),rsummary=document.getElementById('rsummary'),rerr=document.getElementById('rerr'),rok=document.getElementById('rok');
 function paint(){stars.forEach(function(s,i){s.classList.toggle('on',i<rating);s.setAttribute('aria-pressed',i<rating?'true':'false')})}
-stars.forEach(function(s,i){s.onclick=function(){rating=i+1;paint();rerr.textContent='';rok.textContent=''}});
+stars.forEach(function(s,i){s.onclick=function(){rating=(rating===i+1)?0:i+1;paint();rerr.textContent='';rok.textContent=''}});
 document.getElementById('rtext').oninput=function(){rerr.textContent='';rok.textContent=''};
 function starStr(n){var s='';for(var i=1;i<=5;i++)s+=i<=n?'\u2605':'\u2606';return s}
 function countWord(n){return n==1?'تقييم واحد':n==2?'تقييمين':n<=10?n+' تقييمات':n+' تقييم'}
@@ -211,4 +211,4 @@ load();
 })();
 </script>
 </body>
-</html>
+  </html>
