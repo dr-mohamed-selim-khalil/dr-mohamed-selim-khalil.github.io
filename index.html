@@ -14,6 +14,8 @@
 <meta property="og:url" content="https://dr-mohamed-selim-khalil.github.io/">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#fdfcfb">
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":["Physician","MedicalBusiness"],"name":"د. محمد سليم خليل","medicalSpecialty":"Urology","description":"جراحة ومناظير الكلى والمسالك البولية والذكورة والعقم","url":"https://dr-mohamed-selim-khalil.github.io/","telephone":"+201034104849","address":{"@type":"PostalAddress","streetAddress":"شارع حارة عبد اللطيف، بجوار قسم شرطة ديرب نجم وأمام المطافي، الدور الثاني","addressLocality":"ديرب نجم","addressRegion":"الشرقية","addressCountry":"EG"},"sameAs":["https://www.tiktok.com/@dr..mohamed.selim"]}
 </script>
@@ -137,13 +139,16 @@ textarea{width:100%;min-height:110px;border-radius:10px;border:1px solid var(--l
 </section>
 <section id="reviews">
 <p class="eyebrow">آراء المرضى</p><h2>شاركنا تجربتك</h2>
-<p>بعد الكشف، اكتب رأيك واختار تقييمك بالنجوم. رأيك بيوصل للعيادة على واتساب، وبيتنشر هنا بعد المراجعة.</p>
-<div id="rlist"><p class="sub" style="font-size:.95rem">لسه مفيش آراء منشورة. كن أول واحد يشارك تجربته.</p></div>
+<p>بعد الكشف، اكتب رأيك واختار تقييمك بالنجوم. رأيك بينشر هنا على طول وبيشوفه زوار الموقع.</p>
+<p id="rsummary" class="sub" style="font-size:.95rem">بنحمل الآراء...</p>
+<div id="rlist"></div>
 <div class="row"><span class="lbl">تقييمك</span><div class="stars" id="rstars"><button type="button" class="star" aria-label="نجمة 1" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 2" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 3" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 4" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 5" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button></div></div>
-<div class="row"><label for="rname">اسمك (اختياري)</label><input type="text" id="rname" autocomplete="off"></div>
-<div class="row"><label for="rtext">رأيك</label><textarea id="rtext"></textarea></div>
+<div class="row"><label for="rname">اسمك (اختياري)</label><input type="text" id="rname" autocomplete="off" maxlength="60"></div>
+<div class="row"><label for="rtext">رأيك</label><textarea id="rtext" maxlength="500"></textarea></div>
+<p class="sub" style="font-size:.85rem;margin:4px 0 0">اسمك ورأيك بينشروا على الموقع وبيشوفهم الزوار.</p>
 <p id="rerr" role="alert"></p>
-<div class="btns"><a class="btn primary" id="rwa" href="https://wa.me/201034104849" target="_blank" rel="noopener">ابعت رأيك على واتساب</a></div>
+<p id="rok" style="color:var(--accent);font-size:.92rem;min-height:1.5em;margin:0"></p>
+<div class="btns"><button type="button" class="btn primary" id="rpub">انشر رأيك</button></div>
 </section>
 <footer>للحجز والاستفسار: <bdi>01034104849</bdi></footer>
 </main>
@@ -162,15 +167,48 @@ document.getElementById('pname').oninput=upd;upd();
 })();
 var lb=document.getElementById('lb');document.querySelectorAll('.gal .g').forEach(function(b){b.onclick=function(){var i=b.querySelector('img');lb.querySelector('img').src=i.src;lb.querySelector('img').alt=i.alt;lb.className='on'}});lb.onclick=function(){lb.className=''};document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.className=''});
 (function(){
-var rating=0,stars=document.querySelectorAll('#rstars .star');
+var CFG={apiKey:"AIzaSyAcQbe-jbkr9Om9lxROyK1uPOqZDP_YS6E",authDomain:"dr-mohamed-selim-clinic.firebaseapp.com",projectId:"dr-mohamed-selim-clinic",storageBucket:"dr-mohamed-selim-clinic.firebasestorage.app",messagingSenderId:"27688280913",appId:"1:27688280913:web:e45b3e6fef66b667bd6970"};
+var rating=0,stars=document.querySelectorAll('#rstars .star'),rlist=document.getElementById('rlist'),rsummary=document.getElementById('rsummary'),rerr=document.getElementById('rerr'),rok=document.getElementById('rok');
 function paint(){stars.forEach(function(s,i){s.classList.toggle('on',i<rating);s.setAttribute('aria-pressed',i<rating?'true':'false')})}
-function upd(){var n=document.getElementById('rname').value.trim(),t=document.getElementById('rtext').value.trim();var m='رأي مريض من موقع العيادة:\nالتقييم: '+rating+' من 5\nالاسم: '+(n||'بدون اسم')+'\nالرأي: '+t;document.getElementById('rwa').href='https://wa.me/201034104849?text='+encodeURIComponent(m)}
-stars.forEach(function(s,i){s.onclick=function(){rating=i+1;paint();document.getElementById('rerr').textContent='';upd()}});
-document.getElementById('rname').oninput=upd;
-document.getElementById('rtext').oninput=function(){document.getElementById('rerr').textContent='';upd()};
-document.getElementById('rwa').onclick=function(e){var t=document.getElementById('rtext').value.trim();if(!rating||!t){e.preventDefault();document.getElementById('rerr').textContent='اختار عدد النجوم واكتب رأيك الأول.'}};
-upd();
+stars.forEach(function(s,i){s.onclick=function(){rating=i+1;paint();rerr.textContent='';rok.textContent=''}});
+document.getElementById('rtext').oninput=function(){rerr.textContent='';rok.textContent=''};
+function starStr(n){var s='';for(var i=1;i<=5;i++)s+=i<=n?'\u2605':'\u2606';return s}
+function countWord(n){return n==1?'تقييم واحد':n==2?'تقييمين':n<=10?n+' تقييمات':n+' تقييم'}
+function render(revs){
+rlist.innerHTML='';
+if(!revs.length){rsummary.textContent='لسه مفيش تقييمات. كن أول واحد يشارك تجربته.';return}
+var sum=0;revs.forEach(function(r){sum+=r.rating});
+rsummary.textContent='\u2605 '+(sum/revs.length).toFixed(1)+' من 5 · '+countWord(revs.length);
+revs.forEach(function(r){
+var d=document.createElement('div');d.className='rev';
+var st=document.createElement('div');st.className='rs';st.textContent=starStr(r.rating);
+var p=document.createElement('p');p.textContent=r.text;
+var w=document.createElement('span');w.className='rwho';w.textContent=r.name||'بدون اسم';
+d.appendChild(st);d.appendChild(p);d.appendChild(w);rlist.appendChild(d);
+});
+}
+var db=null;
+try{firebase.initializeApp(CFG);db=firebase.firestore()}catch(e){}
+function load(){
+if(!db){rsummary.textContent='تعذر تحميل الآراء.';return}
+db.collection('reviews').orderBy('ts','desc').limit(50).get().then(function(q){
+var revs=[];q.forEach(function(doc){var r=doc.data();revs.push({name:r.name,rating:r.rating,text:r.text})});
+render(revs);
+}).catch(function(){rsummary.textContent='تعذر تحميل الآراء.'});
+}
+document.getElementById('rpub').onclick=function(){
+var n=document.getElementById('rname').value.trim(),t=document.getElementById('rtext').value.trim();
+if(!rating||t.length<2){rerr.textContent='اختار عدد النجوم واكتب رأيك الأول.';return}
+if(!db){rerr.textContent='حصلت مشكلة في النشر. جرب تاني.';return}
+var b=document.getElementById('rpub');b.disabled=true;rerr.textContent='';rok.textContent='';
+db.collection('reviews').add({name:n||'بدون اسم',rating:rating,text:t,ts:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
+document.getElementById('rtext').value='';document.getElementById('rname').value='';rating=0;paint();b.disabled=false;
+rok.textContent='شكراً، رأيك اتنشر.';
+load();
+}).catch(function(){b.disabled=false;rerr.textContent='حصلت مشكلة في النشر. جرب تاني.'});
+};
+load();
 })();
 </script>
 </body>
-  </html>
+</html>
