@@ -59,6 +59,17 @@ dt{color:var(--ink3);width:110px;flex:none}dd{margin:0}
 footer{margin-top:44px;color:var(--ink3)}
 .top{display:flex;justify-content:flex-start}
 .btns .btn{padding:0 10px;font-size:.92rem;flex:1 1 auto;white-space:nowrap}
+textarea{width:100%;min-height:110px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;padding:10px 12px;resize:vertical}
+.stars{display:flex;gap:4px}
+.star{padding:4px;min-width:44px;border:0;background:none;color:var(--ink3)}
+.star.on{color:#e6a23c}
+.star svg{display:block}
+.rev{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:12px;background:var(--card)}
+.rev .rs{color:#e6a23c;letter-spacing:2px}
+.rev p{margin:6px 0}
+.rev .rwho{color:var(--ink3);font-size:.9rem}
+#rerr{color:#b3261e;font-size:.92rem;min-height:1.5em;margin:6px 0 0}
+.dark #rerr{color:#ef9a9a}
 </style>
 </head>
 <body>
@@ -124,6 +135,16 @@ footer{margin-top:44px;color:var(--ink3)}
 </div>
 <div class="note"><b>خصوصيتك</b>بياناتك الطبية سرية. الحجز بيتم على واتساب العيادة ومفيش بيانات بتتخزن على الموقع.</div>
 </section>
+<section id="reviews">
+<p class="eyebrow">آراء المرضى</p><h2>شاركنا تجربتك</h2>
+<p>بعد الكشف، اكتب رأيك واختار تقييمك بالنجوم. رأيك بيوصل للعيادة على واتساب، وبيتنشر هنا بعد المراجعة.</p>
+<div id="rlist"><p class="sub" style="font-size:.95rem">لسه مفيش آراء منشورة. كن أول واحد يشارك تجربته.</p></div>
+<div class="row"><span class="lbl">تقييمك</span><div class="stars" id="rstars"><button type="button" class="star" aria-label="نجمة 1" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 2" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 3" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 4" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 5" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button></div></div>
+<div class="row"><label for="rname">اسمك (اختياري)</label><input type="text" id="rname" autocomplete="off"></div>
+<div class="row"><label for="rtext">رأيك</label><textarea id="rtext"></textarea></div>
+<p id="rerr" role="alert"></p>
+<div class="btns"><a class="btn primary" id="rwa" href="https://wa.me/201034104849" target="_blank" rel="noopener">ابعت رأيك على واتساب</a></div>
+</section>
 <footer>للحجز والاستفسار: <bdi>01034104849</bdi></footer>
 </main>
 <script>
@@ -140,6 +161,16 @@ document.querySelectorAll('.chips').forEach(function(g){g.onclick=function(e){va
 document.getElementById('pname').oninput=upd;upd();
 })();
 var lb=document.getElementById('lb');document.querySelectorAll('.gal .g').forEach(function(b){b.onclick=function(){var i=b.querySelector('img');lb.querySelector('img').src=i.src;lb.querySelector('img').alt=i.alt;lb.className='on'}});lb.onclick=function(){lb.className=''};document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.className=''});
+(function(){
+var rating=0,stars=document.querySelectorAll('#rstars .star');
+function paint(){stars.forEach(function(s,i){s.classList.toggle('on',i<rating);s.setAttribute('aria-pressed',i<rating?'true':'false')})}
+function upd(){var n=document.getElementById('rname').value.trim(),t=document.getElementById('rtext').value.trim();var m='رأي مريض من موقع العيادة:\nالتقييم: '+rating+' من 5\nالاسم: '+(n||'بدون اسم')+'\nالرأي: '+t;document.getElementById('rwa').href='https://wa.me/201034104849?text='+encodeURIComponent(m)}
+stars.forEach(function(s,i){s.onclick=function(){rating=i+1;paint();document.getElementById('rerr').textContent='';upd()}});
+document.getElementById('rname').oninput=upd;
+document.getElementById('rtext').oninput=function(){document.getElementById('rerr').textContent='';upd()};
+document.getElementById('rwa').onclick=function(e){var t=document.getElementById('rtext').value.trim();if(!rating||!t){e.preventDefault();document.getElementById('rerr').textContent='اختار عدد النجوم واكتب رأيك الأول.'}};
+upd();
+})();
 </script>
 </body>
   </html>
