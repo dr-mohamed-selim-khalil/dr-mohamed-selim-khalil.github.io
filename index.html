@@ -144,7 +144,7 @@ textarea{width:100%;min-height:110px;border-radius:10px;border:1px solid var(--l
 <div id="rlist"></div>
 <div class="row"><span class="lbl">تقييمك</span><div class="stars" id="rstars"><button type="button" class="star" aria-label="نجمة 1" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 2" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 3" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 4" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button><button type="button" class="star" aria-label="نجمة 5" aria-pressed="false"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26 6.6 1.04-4.75 4.63 1.12 6.53L12 17.77 6.13 20.46l1.12-6.53L2.5 9.3l6.6-1.04z"/></svg></button></div></div>
 <div class="row"><label for="rname">اسمك</label><input type="text" id="rname" autocomplete="off" maxlength="60"></div>
-<div class="row"><label for="rtext">رأيك</label><textarea id="rtext" maxlength="500"></textarea></div>
+<div class="row"><label for="rtext">رأيك (اختياري)</label><textarea id="rtext" maxlength="500"></textarea></div>
 <p class="sub" style="font-size:.85rem;margin:4px 0 0">اسمك ورأيك بينشروا على الموقع وبيشوفهم الزوار.</p>
 <p id="rerr" role="alert"></p>
 <p id="rok" style="color:var(--accent);font-size:.92rem;min-height:1.5em;margin:0"></p>
@@ -182,9 +182,8 @@ rsummary.textContent='\u2605 '+(sum/revs.length).toFixed(1)+' من 5 · '+countW
 revs.forEach(function(r){
 var d=document.createElement('div');d.className='rev';
 var st=document.createElement('div');st.className='rs';st.textContent=starStr(r.rating);
-var p=document.createElement('p');p.textContent=r.text;
 var w=document.createElement('span');w.className='rwho';w.textContent=r.name;
-d.appendChild(st);d.appendChild(p);d.appendChild(w);rlist.appendChild(d);
+d.appendChild(st);if(r.text){var p=document.createElement('p');p.textContent=r.text;d.appendChild(p)}d.appendChild(w);rlist.appendChild(d);
 });
 }
 var db=null;
@@ -198,7 +197,7 @@ render(revs);
 }
 document.getElementById('rpub').onclick=function(){
 var n=document.getElementById('rname').value.trim(),t=document.getElementById('rtext').value.trim();
-if(!rating||n.length<2||t.length<2){rerr.textContent='اختار عدد النجوم واكتب اسمك ورأيك الأول.';return}
+if(!rating||n.length<2){rerr.textContent='اختار عدد النجوم واكتب اسمك الأول.';return}
 if(!db){rerr.textContent='حصلت مشكلة في النشر. جرب تاني.';return}
 var b=document.getElementById('rpub');b.disabled=true;rerr.textContent='';rok.textContent='';
 db.collection('reviews').add({name:n,rating:rating,text:t,ts:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
